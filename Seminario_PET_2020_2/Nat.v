@@ -43,6 +43,8 @@ Proof.
     reflexivity.
 Qed.
 
+
+
 Lemma mult_n_O : forall (n : nat),
   n * O = O.
 Proof.

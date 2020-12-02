@@ -3,7 +3,7 @@ Theorem example: forall n k : nat,
 Proof.
   intros.
   rewrite H.
-  (*contradiction.*)
+  (* contradiction. *)
   simpl.
   reflexivity.
 Qed.

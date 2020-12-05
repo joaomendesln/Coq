@@ -214,3 +214,27 @@ Proof.
 
       reflexivity.
 Qed.
+
+
+
+Axiom functional_extensionality : forall {X Y: Type}
+                                    {f g : X -> Y},
+  (forall (x:X), f x = g x) -> f = g.
+
+
+Theorem orb_orb_simpb_equiv' :
+  orb = or_simpb.
+Proof. 
+
+
+  apply functional_extensionality.
+  intros.
+  
+  apply functional_extensionality.
+  intros.
+Admitted.
+
+  Check orb.
+  Check orb true.
+
+  

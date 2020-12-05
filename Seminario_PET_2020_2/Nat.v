@@ -35,7 +35,7 @@ Print nat_sind.
 Definition pred (n : nat) : nat :=
   match n with
   | O => O (* [predB] *)
-  | S n' => n' (* [predR] *)
+  | S n => n (* [predR] *)
   end.
 
 
@@ -49,26 +49,26 @@ Compute pred (S (S (S O))).
 
 
 
-(* Definicao 2.2. (soma) *)
+(* Definicao 2.2. (add) *)
 
-(* soma: nat X nat -> nat *)
+(* add: nat X nat -> nat *)
 
-(* [somaB] Para um 'm' arbitrario no conjunto 'nat', 
-           soma (0, m) = m *)
-(* [somaR] Para todos 'm' e 'n' do tipo 'nat',
-           soma (S n, m) = S (soma (n, m)) *)
+(* [addB] Para um 'm' arbitrario no conjunto 'nat', 
+          soma (0, m) = m *)
+(* [addR] Para todos 'm' e 'n' do tipo 'nat',
+          soma (S n, m) = S (soma (n, m)) *)
 
 
-Fixpoint soma (n m : nat) : nat :=
+Fixpoint add (n m : nat) : nat :=
   match n with
-  | O => m (* [somaB] *)
-  | S n => S (soma n m) (* [somaR] *)
+  | O => m (* [addB] *)
+  | S n => S (add n m) (* [addR] *)
   end.
 
 
 (*Calculemos soma (S (S O), S (S O)).*)
 
-Compute soma (S (S O)) (S (S O)).
+Compute add (S (S O)) (S (S O)).
 
 
 
@@ -82,21 +82,21 @@ Compute soma (S (S O)) (S (S O)).
 
 (* mult: nat X nat -> nat *)
 
-(* [multB] Para um 'm' arbitrario do conjunto 'nat', mult (O, m) = O
-(* [multR] Para todos 'm' e 'n' do conjunto 'nat', mult (n, S (m)) = soma ( mult (m, n) ) *)
- *)
+(* [multB] Para um 'm' arbitrario do conjunto 'nat', 
+           mul (O, m) = O *)
+(* [multR] Para todos 'm' e 'n' do conjunto 'nat', 
+           mul (n, S (m)) = add ( mult (m, n) ) *)
+
 
 Fixpoint mult (n m : nat) : nat :=
   match n with
-  | O => O (* [multB] *)
-  | S n => soma m (mult n m) (* [multR] *)
+  | O => O (* [mulB] *)
+  | S n => add m (mult n m) (* [mulR] *)
   end.
 
 
 
-Compute mult (S (S O)) (S O).
-
-Compute mult (S (S O)) (S (S O)).
+Compute mult (S (S O)) (S (S (S O))).
 
 
 
@@ -106,7 +106,7 @@ Compute mult (S (S O)) (S (S O)).
 
 
 
-Notation "x + y" := (soma x y)
+Notation "x + y" := (add x y)
 (at level 50, left associativity).
 
 Notation "x * y" := (mult x y)
@@ -128,16 +128,16 @@ Proof.
   (* Seja 'n' um elemento arbitrário de 'nat'. *)
   intro n.
 
-  apply (nat_ind (fun n => n + O = n)). 
+  (* apply (nat_ind (fun n => n + O = n)).  *)
 
   (* Demonstremos por indução em 'n' que n + O = n *)
-(*   induction n as [| k HI]. 
- *)
+  induction n as [| k HI].
+
   (* [base: n := O] *)
   - (* [somaB] *)
     simpl.
 
-    
+    (* Reflexividade da '=' *)
     reflexivity.
 
   (* [passo indutivo] *)
@@ -145,10 +145,11 @@ Proof.
   (* Demonstremos que Sk + O = Sk. *)
   - (* [somaR] *)
     simpl.
-    intros.
 
     (* Hipótese de indução*) 
-    rewrite H.
+    rewrite HI.
+
+    (* Reflexividade da '=' *)
     reflexivity.
 
 Qed.
@@ -174,7 +175,9 @@ Proof.
 
   (* [base: n := O] *)
   - (* [multB] *) 
-    simpl. 
+    simpl.
+
+    (* Reflexividade da '=' *)
     reflexivity.
 
   (* [passo indutivo] *)
@@ -196,20 +199,21 @@ Qed.
 
 
 
-(* Teorema 2.3. Verifique que x * O + y * O = 0 para 'x' e 'y' arbitrários em 'nat' *)
-Theorem mult_n_O_m_0 : forall (x y : nat),
-  x * O + y * O = O.
+(* Teorema 2.3. Verifique que n * O + m * O = 0 para 'n' e 'm' arbitrários em 'nat'. *)
+Theorem mult_n_O_m_0 : forall (n m : nat),
+  n * O + m * O = O.
 Proof.
 
-  (* Sejam x e y em nat. *)
-  intros x y.
+  (* Sejam 'n' e 'm' em nat. *)
+  intros n m.
 
-  (* Pelo Teorema 2.2., temos que x * O = O e y * O = O *)
+  (* Pelo Teorema 2.2., temos que n * O = O e m * O = O *)
   repeat rewrite mult_n_O.
 
   (* [somaB] *)
   simpl.
-   
+
+  (* Reflexividade da '=' *)
   reflexivity.
 
 Qed.

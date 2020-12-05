@@ -28,7 +28,7 @@ Notation "[ x ; .. ; y ]" := (cons x .. (cons y nil) ..).
 
 (* Definicao 3.1. (append) *)
 
-(* pred : natlist X natlist -> natlist *)
+(* append : natlist X natlist -> natlist *)
 
 (* Para um 'l1' e 'l2' arbitrárias no conjunto 'natlist', 
    [appendB] Caso l1 := []: append (l1, l2) = l2
@@ -45,7 +45,7 @@ Notation "l1 ++ l2" := (append l1 l2)
                        (at level 60, right associativity).
 
 
-Compute [1;2] ++ [4;5;6].
+(* Compute [1;2] ++ [4;5;6]. *)
 
 
 
@@ -65,14 +65,12 @@ Compute [1;2] ++ [4;5;6].
 
 Fixpoint length (l : natlist) : nat :=
   match l with
-  | nil => 0 (* [lengthB] *)
-  | h <+ t => 1 + length t (* [lengthB] *)
+  | nil => O (* [lengthB] *)
+  | h <+ t => S O + length t (* [lengthB] *)
   end.
 
-Compute length [0;7;4].
 
-
-(* Teorema 3.1. Demonstre que 'length' distribui sobre 'append'.*)
+(* Teorema 3.1. Verifique que length (l1 ++ l2) = (length l1) + (length l2) para 'l1' e 'l2' arbitrários em natlist.*)
 
 Theorem app_length : forall (l1 l2 : natlist), 
   length (l1 ++ l2) = (length l1) + (length l2).
@@ -89,6 +87,7 @@ Proof.
   - (* [lengthB] *)
     simpl.
 
+    (* Reflexividade da '=' *)
     reflexivity.
 
   (* [passo indutivo] *)
@@ -100,65 +99,6 @@ Proof.
     (* Hipótese de indução *)
     rewrite IHt.
 
+    (* Reflexividade da '=' *)
     reflexivity.
 Qed. 
-
-
-
-
-(* ----------------------------------------- *)
-
-
-
-
-(* Definicao 3.2. (reverse) *)
-
-(* length : natlist -> natlist *)
-
-(* Para um 'l' arbitrária no conjunto 'natlist', 
-   [reverseB] Caso l := []: reverse (l) = []
-   [reverseR] Caso l := h <+ t: reverse (l) = append (reverse(t), h) *)
-
-Fixpoint reverse (l : natlist) : natlist :=
-  match l with
-  | nil => nil (* [reverseB] *)
-  | h <+ t => reverse t ++ [h] (* [reverseR] *)
-  end.
-
-Compute reverse [1;2;3].
-
-
-(* Teorema 3.2. Seja 'l' um elemento de 'listnat'. Verifique que length (reverse (l)) = length (l) *)
-Theorem rev_length : forall (l : natlist),
-  length (reverse l) = length l.
-Proof.
-  (* Seja 'l' um elemento de 'listanat'. *)
-  intro l.
-
-  (* Demonstremos por indução estrutural em 'l' que length (reverse (l)) = length (l) *)
-  induction l as [| h t IHt].
-
-  (* [base: l1 := []] *)
-  - (* [lengthB] *)
-    simpl. 
-
-    reflexivity.
-  
-  (* [passo indutivo] *)
-  (* Seja 't' em 'listnat' tal que length (reverse (t)) = length (t). *)
-  (* Demonstremos que length ((h <+ t) ++ l2) = length (h <+ t) + length (l2). *)
-  - (* [lengthR] *)
-    simpl.
-
-    (* Teorema 3.1 *)
-    rewrite app_length.
-
-    (* Hipótese de indução *)
-    rewrite IHt.
-
-    (* [lengthR], [lengthB], soma??? *)
-    simpl.
-  assert (H : forall (n m : nat), n + m = m + n).
-    + admit.
-    + rewrite H. simpl. reflexivity.
-  

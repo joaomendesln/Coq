@@ -1,3 +1,8 @@
+Require Import Nat.
+
+Compute 3 + 4.
+
+
 (* nat ::= O | S nat *)
 
 Inductive nat: Set :=
@@ -5,16 +10,12 @@ Inductive nat: Set :=
   | S (n : nat)
 .
 
-
-Print nat_rect.
-Print nat_ind.
-Print nat_rec.
-Print nat_sind.
-
-
 (* 'O' pertence ao conjunto 'nat'; *)
-(* Se 'n' e uma expressão construtora pertencente ao conjunto 'nat', então o construtor 'S' aplicado ao argumento 'n' pertence ao conjunto 'nat'; *)
+(* Se 'n' é uma expressão construtora pertencente ao conjunto 'nat', então o construtor 'S' aplicado ao argumento 'n' pertence ao conjunto 'nat'; *)
 (* Essas são as únicas expressões construtoras que pertencem ao conjunto 'nat'. *)
+
+
+Print nat_ind.
 
 
 
@@ -39,9 +40,6 @@ Definition pred (n : nat) : nat :=
   end.
 
 
-Compute pred (S (S (S O))).
-
-
 
 
 (* ----------------------------------------- *)
@@ -49,26 +47,21 @@ Compute pred (S (S (S O))).
 
 
 
-(* Definicao 2.2. (add) *)
+(* Definicao 2.2. (plus) *)
 
-(* add: nat X nat -> nat *)
+(* plus: nat X nat -> nat *)
 
-(* [addB] Para um 'm' arbitrario no conjunto 'nat', 
-          soma (0, m) = m *)
-(* [addR] Para todos 'm' e 'n' do tipo 'nat',
-          soma (S n, m) = S (soma (n, m)) *)
+(* [plusB] Para um 'm' arbitrário no conjunto 'nat', 
+          plus (O, m) = m *)
+(* [plusR] Para todos 'm' e 'n' do tipo 'nat',
+          plus (S n, m) = S (plus (n, m)) *)
 
 
-Fixpoint add (n m : nat) : nat :=
+Fixpoint plus (n m : nat) : nat :=
   match n with
-  | O => m (* [addB] *)
-  | S n => S (add n m) (* [addR] *)
+  | O => m (* [plusB] *)
+  | S n => S (plus n m) (* [plusR] *)
   end.
-
-
-(*Calculemos soma (S (S O), S (S O)).*)
-
-Compute add (S (S O)) (S (S O)).
 
 
 
@@ -82,21 +75,19 @@ Compute add (S (S O)) (S (S O)).
 
 (* mult: nat X nat -> nat *)
 
-(* [multB] Para um 'm' arbitrario do conjunto 'nat', 
-           mul (O, m) = O *)
+(* [multB] Para um 'm' arbitrário do conjunto 'nat', 
+           mult (O, m) = O *)
 (* [multR] Para todos 'm' e 'n' do conjunto 'nat', 
-           mul (n, S (m)) = add ( mult (m, n) ) *)
+           mult (S (n), m) = plus (m, (mult (n, m))) *)
 
 
 Fixpoint mult (n m : nat) : nat :=
   match n with
-  | O => O (* [mulB] *)
-  | S n => add m (mult n m) (* [mulR] *)
+  | O => O (* [multB] *)
+  | S n => plus m (mult n m) (* [multR] *)
   end.
 
-
-
-Compute mult (S (S O)) (S (S (S O))).
+Check mult.
 
 
 
@@ -106,7 +97,7 @@ Compute mult (S (S O)) (S (S (S O))).
 
 
 
-Notation "x + y" := (add x y)
+Notation "x + y" := (plus x y)
 (at level 50, left associativity).
 
 Notation "x * y" := (mult x y)
@@ -121,32 +112,33 @@ Notation "x * y" := (mult x y)
 
 
 (* Teorema 2.1. Verifique que, para qualquer 'n' do conjunto 'nat', n + O = n. *)
-Theorem soma_n_O : forall (n : nat),
+Theorem plus_n_O : forall (n : nat),
   n + O = n.
 Proof.
 
   (* Seja 'n' um elemento arbitrário de 'nat'. *)
   intro n.
 
-  (* apply (nat_ind (fun n => n + O = n)).  *)
-
   (* Demonstremos por indução em 'n' que n + O = n *)
   induction n as [| k HI].
 
+  (* OBS: O que essa tática faz é aplicar nat_ind *)
+
+
   (* [base: n := O] *)
-  - (* [somaB] *)
+  - (* [plusB] *)
     simpl.
 
     (* Reflexividade da '=' *)
     reflexivity.
 
   (* [passo indutivo] *)
-  (* Seja 'k' um elemento de 'nat' tal que k + O = k. *)
+  (* Seja 'k' um elemento qualquer de 'nat' tal que k + O = k. *)
   (* Demonstremos que Sk + O = Sk. *)
-  - (* [somaR] *)
+  - (* [plusR] *)
     simpl.
 
-    (* Hipótese de indução*) 
+    (* Hipótese de indução *) 
     rewrite HI.
 
     (* Reflexividade da '=' *)
@@ -163,33 +155,6 @@ Qed.
 
 
 (* Teorema 2.2. Verifique que, para qualquer 'n' do tipo 'nat', n * O = O. *)
-Lemma mult_n_O : forall (n : nat),
-  n * O = O.
-Proof.
-  
-  (* Seja 'n' um elemento arbitrario de 'nat'. *)
-  intro n.
-
-  (* Demonstremos por inducao em 'n' que n * O = O *)
-  induction n as [| j HI].
-
-  (* [base: n := O] *)
-  - (* [multB] *) 
-    simpl.
-
-    (* Reflexividade da '=' *)
-    reflexivity.
-
-  (* [passo indutivo] *)
-  (* Seja 'j' um elemento de 'nat' tal que j * O = O. *)
-  (* Demonstremos que Sj * O = Sj. *)
-  - (* [multR] *) 
-    simpl.
-
-    (* Hipótese de indução *)      
-    apply HI.
-
-Qed.
 
 
 
@@ -200,20 +165,3 @@ Qed.
 
 
 (* Teorema 2.3. Verifique que n * O + m * O = 0 para 'n' e 'm' arbitrários em 'nat'. *)
-Theorem mult_n_O_m_0 : forall (n m : nat),
-  n * O + m * O = O.
-Proof.
-
-  (* Sejam 'n' e 'm' em nat. *)
-  intros n m.
-
-  (* Pelo Teorema 2.2., temos que n * O = O e m * O = O *)
-  repeat rewrite mult_n_O.
-
-  (* [somaB] *)
-  simpl.
-
-  (* Reflexividade da '=' *)
-  reflexivity.
-
-Qed.
